@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="45">
+  <CheatEntries/>
+  <UserdefinedSymbols/>
+  <LuaScript>local dumpedNames = {}
+
+local function dumpBuffer()
+   local pName = readPointer(ESP+0x10)
+   local name = readString(pName)
+
+   if dumpedNames[name] then
+      return
+   end
+
+   local pLua = readPointer(ESP+0x8)
+   local size = readInteger(pLua-0x4)
+   local lua  = readBytes(pLua, size, true)
+   lua = byteTableToString(lua)
+
+   local temp = io.open(TrainerOrigin.."temp", "wb")
+   temp:write(lua)
+   temp:close()
+
+   os.execute("java -jar unluac.jar temp &gt; Game\\"..name.."a")
+   dumpedNames[name] = true
+end
+
+debug_setBreakpoint("lua.luaL_loadbuffer", dumpBuffer)
+
+</LuaScript>
+</CheatTable>
